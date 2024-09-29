@@ -6,15 +6,24 @@ import styles from './searchBar.module.css';
 
 const SearchBar = () => {
   const [search, setSearch] = useState('');
-  const [show, setShow] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const dispatch = useDispatch();
 
   const foundProducts = useSelector((state) => state.products.foundProducts);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setShow(true); 
-    dispatch(findProduct(search));
+
+    if (search.trim() === '') {
+      setShowResults(false); // Hide results
+      setErrorMessage('Please enter a valid search term.'); // Show error
+      return;
+    }
+    
+    setShowResults(true); 
+    setErrorMessage(''); 
+    dispatch(findProduct(search)); 
   };
 
   return (
@@ -32,7 +41,7 @@ const SearchBar = () => {
         </button>
       </form>
 
-      {show && foundProducts.length > 0 ? (
+      {showResults && foundProducts.length > 0 ? (
         <div>
           <h3>Results</h3>
           <div className={styles.productGrid}>
@@ -46,11 +55,11 @@ const SearchBar = () => {
               />
               <p className={styles.productPrice}>${product.price}</p>
             </div>
-            
           ))}
           </div>
+          <h2>More Products you might like</h2>
         </div>
-      ) : show && foundProducts.length === 0 ? (
+      ) : showResults && foundProducts.length === 0 ? (
         <p>No products found</p>
       ) : null}
     </div>
